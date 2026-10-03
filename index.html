@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>A Letter Just For You</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg1: #fde6ee;
+        --bg2: #e9ddf7;
+        --ink: #4a2740;
+        --soft: #8a5a7c;
+        --rose: #e0507a;
+        --card: #fff8fb;
+        --paper: #fffaf3;
+        --night1: #2b1740;
+        --night2: #4a2a5e;
+        --hand: "Caveat", "Bradley Hand", "Segoe Script", cursive;
+        --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg1: #2a1632;
+          --bg2: #1f1838;
+          --ink: #fbe7f0;
+          --soft: #d9aac8;
+          --card: #3a2146;
+          --paper: #3b2840;
+        }
+      }
+      :root[data-theme="dark"] {
+        --bg1: #2a1632;
+        --bg2: #1f1838;
+        --ink: #fbe7f0;
+        --soft: #d9aac8;
+        --card: #3a2146;
+        --paper: #3b2840;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: linear-gradient(160deg, var(--bg1), var(--bg2)) fixed;
+        color: var(--ink);
+        font-family: var(--serif);
+        font-size: 20px;
+        line-height: 1.6;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: var(--hand);
+        font-weight: 700;
+        line-height: 1.1;
+        margin: 0 0 0.5em;
+      }
+      h2 {
+        font-size: clamp(2.2rem, 8vw, 3.2rem);
+        text-align: center;
+      }
+      p {
+        margin: 0 0 1em;
+      }
+      section {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 72px 22px;
+        text-align: center;
+        position: relative;
+      }
+      .wrap {
+        max-width: 560px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+      }
+      button:focus-visible {
+        outline: 3px solid var(--rose);
+        outline-offset: 3px;
+      }
+      .btn {
+        font-family: var(--hand);
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: #fff;
+        background: var(--rose);
+        border: 0;
+        border-radius: 40px;
+        padding: 0.35em 1.4em;
+        box-shadow: 0 6px 18px rgba(224, 80, 122, 0.35);
+        transition: transform 0.2s;
+      }
+      .btn:hover {
+        transform: scale(1.05);
+      }
+      .rv {
+        opacity: 0;
+        transform: translateY(18px);
+        transition:
+          opacity 0.9s,
+          transform 0.9s;
+      }
+      .rv.on {
+        opacity: 1;
+        transform: none;
+      }
+      #fx {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+        overflow: hidden;
+      }
+      .fl {
+        position: absolute;
+        bottom: -30px;
+        animation: up linear forwards;
+        opacity: 0.7;
+      }
+      @keyframes up {
+        to {
+          transform: translateY(-115vh) translateX(var(--dx));
+          opacity: 0;
+        }
+      }
+      main {
+        position: relative;
+        z-index: 2;
+      }
+      #music {
+        position: fixed;
+        top: calc(12px + env(safe-area-inset-top, 0px));
+        right: 12px;
+        z-index: 20;
+        border: 0;
+        background: var(--card);
+        color: var(--ink);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        font-size: 1.2rem;
+      }
+
+      /* envelope */
+      #cover {
+        z-index: 30;
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(160deg, var(--bg1), var(--bg2));
+        transition:
+          opacity 1s,
+          visibility 1s;
+      }
+      #cover.gone {
+        opacity: 0;
+        visibility: hidden;
+      }
+      #cover .wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .env {
+        position: relative;
+        width: min(300px, 76vw);
+        height: 200px;
+        margin: 26px 0 34px;
+        transition: transform 0.6s;
+      }
+      .env .body {
+        position: absolute;
+        inset: 0;
+        background: #f7c4d6;
+        border-radius: 6px;
+        box-shadow: 0 12px 30px rgba(120, 40, 90, 0.25);
+        overflow: hidden;
+      }
+      .env .body:before,
+      .env .body:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        width: 0;
+        height: 0;
+        border-style: solid;
+      }
+      .env .body:before {
+        left: 0;
+        border-width: 100px 0 100px min(150px, 38vw);
+        border-color: transparent transparent transparent #f2a9c3;
+      }
+      .env .body:after {
+        right: 0;
+        border-width: 100px min(150px, 38vw) 100px 0;
+        border-color: transparent #f2a9c3 transparent transparent;
+      }
+      .env .flap {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 110px;
+        background: #eb92b2;
+        clip-path: polygon(0 0, 100% 0, 50% 100%);
+        transform-origin: top;
+        transition:
+          transform 0.8s 0.1s,
+          z-index 0s 0.4s;
+        z-index: 3;
+        border-radius: 6px 6px 0 0;
+      }
+      .env .pocket {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: #f2a9c3;
+        clip-path: polygon(0 0, 50% 55%, 100% 0, 100% 100%, 0 100%);
+        border-radius: 6px;
+      }
+      .env .card {
+        position: absolute;
+        left: 8%;
+        right: 8%;
+        top: 14px;
+        bottom: 14px;
+        background: #fffaf3;
+        border-radius: 4px;
+        z-index: 1;
+        transition: transform 0.9s 0.6s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--hand);
+        font-size: 1.8rem;
+        color: var(--rose);
+      }
+      .env .seal {
+        position: absolute;
+        left: 50%;
+        top: 92px;
+        transform: translateX(-50%);
+        z-index: 4;
+        font-size: 1.8rem;
+        transition: opacity 0.3s;
+      }
+      .env.open .flap {
+        transform: rotateX(180deg);
+        z-index: 0;
+      }
+      .env.open .card {
+        transform: translateY(-90px);
+      }
+      .env.open .seal {
+        opacity: 0;
+      }
+      .env.open {
+        transform: scale(1.15);
+      }
+
+      /* 4 months */
+      .big {
+        font-family: var(--hand);
+        font-size: clamp(7rem, 32vw, 11rem);
+        color: var(--rose);
+        line-height: 1;
+        display: inline-block;
+        transform: scale(0.2);
+        opacity: 0;
+        transition:
+          transform 1.2s cubic-bezier(0.2, 1.5, 0.4, 1),
+          opacity 0.8s;
+      }
+      .on .big {
+        transform: scale(1);
+        opacity: 1;
+      }
+      .mo {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 28px;
+      }
+      .mo div {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 16px 12px;
+        box-shadow: 0 4px 14px rgba(120, 40, 90, 0.12);
+        text-align: left;
+      }
+      .mo div:nth-child(odd) {
+        transform: rotate(-1.2deg);
+      }
+      .mo div:nth-child(even) {
+        transform: rotate(1.2deg);
+      }
+      .mo h3 {
+        font-size: 1.5rem;
+        color: var(--rose);
+        margin: 0;
+      }
+      .mo p {
+        font-size: 0.95rem;
+        margin: 0.2em 0 0;
+        color: var(--soft);
+      }
+      @media (max-width: 380px) {
+        .mo {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* flip cards */
+      .flips {
+        display: grid;
+        gap: 14px;
+        margin-top: 20px;
+      }
+      .flip {
+        perspective: 900px;
+        height: 84px;
+        background: none;
+        border: 0;
+        padding: 0;
+        width: 100%;
+      }
+      .flip i {
+        display: block;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.7s;
+        transform-style: preserve-3d;
+      }
+      .flip.on-flip i {
+        transform: rotateY(180deg);
+      }
+      .flip b {
+        position: absolute;
+        inset: 0;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        font-style: normal;
+        font-weight: 400;
+        box-shadow: 0 4px 14px rgba(120, 40, 90, 0.14);
+      }
+      .flip .f {
+        background: var(--card);
+        color: var(--ink);
+        font-size: 1.25rem;
+      }
+      .flip .k {
+        background: var(--rose);
+        color: #fff;
+        transform: rotateY(180deg);
+        font-family: var(--hand);
+        font-size: 1.35rem;
+        line-height: 1.2;
+      }
+      .hint {
+        font-size: 0.9rem;
+        color: var(--soft);
+        font-style: italic;
+      }
+
+      /* polaroids */
+      .gal {
+        display: flex;
+        flex-direction: column;
+        gap: 34px;
+        align-items: center;
+        margin-top: 22px;
+      }
+      .pol {
+        background: #fff;
+        padding: 12px 12px 16px;
+        width: min(270px, 80vw);
+        box-shadow: 0 8px 22px rgba(60, 20, 60, 0.22);
+        transition: transform 0.3s;
+        color: #4a2740;
+      }
+      .pol .ph {
+        aspect-ratio: 1;
+        background: linear-gradient(135deg, #f9c6d8, #d9c6f3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        overflow: hidden;
+      }
+      .pol img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .pol p {
+        font-family: var(--hand);
+        font-size: 1.3rem;
+        line-height: 1.15;
+        margin: 12px 0 0;
+      }
+
+      /* night */
+      #night {
+        background: linear-gradient(
+          180deg,
+          transparent,
+          var(--night1) 25%,
+          var(--night2) 100%
+        );
+        color: #fbe7f0;
+        min-height: 110vh;
+      }
+      #night .ln {
+        opacity: 0;
+        transition: opacity 2s;
+        font-size: 1.35rem;
+        margin-bottom: 1.2em;
+      }
+      #night .ln.on {
+        opacity: 1;
+      }
+      #night .last {
+        font-family: var(--hand);
+        font-size: 2.2rem;
+        color: #ffb3cd;
+      }
+
+      /* letter */
+      .paper {
+        background: var(--paper);
+        background-image: repeating-linear-gradient(
+          transparent 0 35px,
+          rgba(243, 240, 241, 0.952) 35px 36px
+        );
+        border-radius: 6px;
+        padding: 34px 26px;
+        text-align: left;
+        box-shadow: 0 14px 40px rgba(90, 30, 80, 0.22);
+        font-family: var(--hand);
+        font-size: 1.55rem;
+        line-height: 36px;
+        min-height: 420px;
+        position: relative;
+        white-space: pre-wrap;
+        color: #ebe4e9;
+      }
+      .paper:before {
+        content: "";
+        position: absolute;
+        left: 14px;
+        top: 0;
+        bottom: 0;
+        border-left: 2px solid rgb(155, 71, 71);
+      }
+      .paper .cur {
+        display: inline-block;
+        width: 2px;
+        height: 1.1em;
+        background: var(--rose);
+        vertical-align: middle;
+        margin-left: 2px;
+        animation: bl 1s steps(1) infinite;
+      }
+      @keyframes bl {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      /* surprise */
+      #reveal {
+        display: none;
+        margin-top: 10px;
+      }
+      #reveal h2 {
+        font-size: clamp(2.4rem, 9vw, 3.6rem);
+        color: var(--rose);
+      }
+      .fin {
+        font-family: var(--hand);
+        font-size: 2rem;
+        color: var(--rose);
+        margin-top: 1.4em;
+        line-height: 1.3;
+      }
+      .pop {
+        position: fixed;
+        z-index: 40;
+        pointer-events: none;
+        font-size: 1.6rem;
+        animation: pp 2.4s ease-out forwards;
+      }
+      @keyframes pp {
+        to {
+          transform: translate(var(--x), var(--y)) rotate(var(--r));
+          opacity: 0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition-duration: 0.01s !important;
+        }
+        .rv {
+          opacity: 1;
+          transform: none;
+        }
+        .big {
+          opacity: 1;
+          transform: none;
+        }
+        #night .ln {
+          opacity: 1;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cover">
+      <section class="wrap" style="min-height: 100%">
+        <div class="wrap">
+          <h1 style="font-size: 2.6rem">💌 Hey, Baby...</h1>
+          <p>
+            I made something special for you.<br />It's not much, but every word
+            here comes from my heart. ❤️
+          </p>
+          <div class="env" id="env">
+            <div class="body"></div>
+            <div class="card">For you</div>
+            <div class="pocket"></div>
+            <div class="flap"></div>
+            <div class="seal">❤️</div>
+          </div>
+          <button class="btn" id="openBtn">Open my letter</button>
+        </div>
+      </section>
+    </div>
+
+    <button id="music" aria-label="Play music" title="Music">🎵</button>
+    <div id="fx" aria-hidden="true"></div>
+
+    <main id="main" hidden>
+      <section id="s1">
+        <div class="wrap rv">
+          <h2>🌷 Before you read...</h2>
+          <p>
+            Before you read this, gusto ko lang malaman mo na you mean so much to me, di ko man na e-express ng maayos, baby. Pero, mahal na mahal po kita.
+          </p>
+          <a href="#s2"><button class="btn" tabindex="-1">Continue</button></a>
+        </div>
+      </section>
+
+      <section id="s2">
+        <div class="wrap rv">
+          <h2>❤️ 4 months with you</h2>
+          <div class="big">4</div>
+          <p style="font-size: 1.5rem; font-family: var(--hand); margin: 0">
+            months.
+          </p>
+          <p>
+            It might not sound like a very long time, but somehow, you've
+            already become such an important part of my life.
+          </p>
+          <div class="mo">
+            <div>
+              <h3>.</h3>
+              <p>Di ko inakala na aabot tayo sa ganito. lahat ng mga bagay na nangyari sa relasyon natin ay nagpapakita ng kung gaano mo ako mahal.</p>
+            </div>
+            <div>
+              <h3>..</h3>
+              <p>Sorry talaga if I started our relationship in a worse way possible, I'm really sorry.</p>
+            </div>
+            <div>
+              <h3>...</h3>
+              <p>Ang dami kong natutunan ko sa loob ng 4 buwan and mas naiintindihan na kita lalo na ngayon.</p>
+            </div>
+            <div>
+              <h3>....</h3>
+              <p>Mas lalaliman ko pa pag iitindi ko at bibigay ko lahat ng makakakaya ko para sayo.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s3">
+        <div class="wrap">
+          <h2 class="rv">🥹 Things I love about you</h2>
+          <p class="hint rv">Tap each one to open it.</p>
+          <div class="flips" id="flips"></div>
+        </div>
+      </section>
+
+      <section id="s4">
+        <div class="wrap">
+          <h2 class="rv">📸 My favorite memories</h2>
+          <div class="gal" id="gal"></div>
+        </div>
+      </section>
+
+      <section id="night">
+        <div class="wrap">
+          <h2 style="color: #ffd3e3" class="rv">
+            🌙 Things I wish I could tell you in person
+          </h2>
+          <p class="ln">I wish I could be there beside you right now.</p>
+          <p class="ln">
+            I wish I could see your smile instead of seeing it through a screen.
+          </p>
+          <p class="ln">
+            I wish I could hold you and tell you these things myself.
+          </p>
+          <p class="ln last">But until that day comes...</p>
+        </div>
+      </section>
+
+      <section id="s6">
+        <div class="wrap">
+          <h2 class="rv">💌 For you</h2>
+          <div class="paper rv" id="paper" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section id="s7">
+        <div class="wrap">
+          <div id="ask" class="rv" style="opacity: 0">
+            <h2>Wait... there's one more thing. 👀</h2>
+            <button class="btn" id="surprise">One more surprise</button>
+          </div>
+          <div id="reveal">
+            <h2>Happy 4th Monthsary, My Baby ❤️</h2>
+            <p>Thank you for these four beautiful months.</p>
+            <p>
+              And if you'll let me...<br />I'd love to make many more memories
+              with you.
+            </p>
+            <div class="fin">4 Months Down ❤️<br />So Many More To Go ♾️</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      /* ===== EDIT THESE ===== */
+      const NICK = "Baby",
+        ME = "AJ";
+      const LOVES = [
+        ["Your smile", "One of my favorite things about you is your smile, nawawala inis ko napapalitan ng libog"],
+        ["The way you talk to me", "Your voice is so soothing, it makes me feel at peace."],
+        ["Your little habits", "yung pag sayaw and kanta out of nowhere at pag gaya gaya mo sa mga bagay na ginagawa ko, gusto ko talaga yun."],
+        ["The way you make me feel", "pag intindi mo sakin at pag alaga mo sakin, I feel so loved and cared for."],
+        ["The moments when you make me laugh", "and funny funny mo, mga ginagawa mong mukha, and mga jokes mo, I love it when you make me laugh."],
+        ["Simply having you in my life", "I'm just so grateful to have you in my life, and I can't imagine my days without you."],
+      ];
+      const PICS = [
+        
+        {
+          src: "img1.jpg",
+          cap: "I don't think you realize how much this moment means to me.",
+        },
+        { src: "img2.jpg", cap: "One of the moments I'll always remember." },
+        { src: "img3.jpg", cap: "Pinapanood lang kita lagi pag nakakatulog ka, creepy ba?" },
+      ];
+      const LETTER = `Dear ${NICK},
+
+I just want to say that I love you so much. I know I don't express it enough, but I hope you know that every word here comes from my heart. You mean the world to me, and I'm so grateful for every moment we've shared together.
+
+Baby,
+${ME} ❤️`;
+      /* ====================== */
+      const $ = (s) => document.querySelector(s),
+        RM = matchMedia("(prefers-reduced-motion:reduce)").matches;
+      const fx = $("#fx");
+      function floaty() {
+        const e = document.createElement("span");
+        e.className = "fl";
+        e.textContent = ["❤️", "💕", "✨", "🌸", "💗"][(Math.random() * 5) | 0];
+        e.style.cssText = `left:${Math.random() * 100}%;font-size:${10 + Math.random() * 14}px;animation-duration:${9 + Math.random() * 8}s;--dx:${(Math.random() - 0.5) * 80}px`;
+        fx.appendChild(e);
+        setTimeout(() => e.remove(), 18000);
+      }
+      if (!RM) setInterval(floaty, 1400);
+
+      LOVES.forEach(([t, m]) => {
+        const b = document.createElement("button");
+        b.className = "flip rv";
+        b.setAttribute("aria-label", t);
+        b.innerHTML = `<i><b class="f">❤️ ${t}</b><b class="k">${m}</b></i>`;
+        b.onclick = () => b.classList.toggle("on-flip");
+        $("#flips").appendChild(b);
+      });
+      PICS.forEach((p, i) => {
+        const d = document.createElement("div");
+        d.className = "pol";
+        d.dataset.r = i % 2 ? 3 : -3;
+        d.innerHTML = `<div class="ph">${p.src ? `<img src="${p.src}" alt="">` : "📷"}</div><p>${p.cap}</p>`;
+        $("#gal").appendChild(d);
+      });
+      function tilt() {
+        document.querySelectorAll(".pol").forEach((d) => {
+          const r = d.getBoundingClientRect(),
+            k = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
+          d.style.transform = `rotate(${+d.dataset.r + k * 5}deg)`;
+        });
+      }
+      addEventListener("scroll", tilt, { passive: true });
+
+      $("#openBtn").onclick = () => {
+        $("#env").classList.add("open");
+        $("#openBtn").disabled = true;
+        setTimeout(
+          () => {
+            $("#cover").classList.add("gone");
+            $("#main").hidden = false;
+            watch();
+            tilt();
+            scrollTo(0, 0);
+          },
+          RM ? 100 : 2000,
+        );
+      };
+
+      let typed = false;
+      function typeLetter() {
+        if (typed) return;
+        typed = true;
+        const el = $("#paper");
+        let i = 0;
+        if (RM) {
+          el.textContent = LETTER;
+          showAsk();
+          return;
+        }
+        const c = '<span class="cur"></span>';
+        (function step() {
+          el.innerHTML = LETTER.slice(0, i).replace(/</g, "&lt;") + c;
+          if (i++ < LETTER.length)
+            setTimeout(step, LETTER[i - 2] === "\n" ? 250 : 45);
+          else {
+            el.textContent = LETTER;
+            showAsk();
+          }
+        })();
+      }
+      function showAsk() {
+        setTimeout(() => {
+          const a = $("#ask");
+          a.style.opacity = 1;
+          a.classList.add("on");
+        }, 1200);
+      }
+      function watch() {
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (!e.isIntersecting) return;
+              e.target.classList.add("on");
+              if (e.target.id === "paper") typeLetter();
+              if (e.target.classList.contains("ln")) {
+              }
+              io.unobserve(e.target);
+            }),
+          { threshold: 0.35 },
+        );
+        document.querySelectorAll(".rv,.ln").forEach((el) => io.observe(el));
+        document
+          .querySelectorAll(".ln")
+          .forEach((el, i) => (el.style.transitionDelay = "0s"));
+        // stagger the flip cards and night lines
+        document
+          .querySelectorAll(".flip")
+          .forEach((el, i) => (el.style.transitionDelay = i * 0.12 + "s"));
+        document
+          .querySelectorAll(".ln")
+          .forEach((el, i) => (el.style.transitionDelay = i * 0.9 + "s"));
+      }
+
+      $("#surprise").onclick = () => {
+        $("#ask").style.display = "none";
+        $("#reveal").style.display = "block";
+        if (!RM)
+          for (let i = 0; i < 70; i++) {
+            const p = document.createElement("span");
+            p.className = "pop";
+            p.textContent = ["❤️", "🎉", "💖", "✨", "🌸", "💕"][
+              (Math.random() * 6) | 0
+            ];
+            p.style.cssText = `left:50%;top:55%;--x:${(Math.random() - 0.5) * 110}vw;--y:${-30 - Math.random() * 70}vh;--r:${Math.random() * 720 - 360}deg`;
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 2600);
+          }
+        $("#reveal").scrollIntoView({ behavior: "smooth", block: "center" });
+      };
+
+      /* soft ambient music (generated, no files) */
+      let ac,
+        on = false,
+        nodes = [];
+      function ambient() {
+        try {
+          if (!ac) {
+            ac = new (window.AudioContext || window.webkitAudioContext)();
+            const g = ac.createGain();
+            g.gain.value = 0.05;
+            g.connect(ac.destination);
+            [261.63, 329.63, 392, 523.25].forEach((f, i) => {
+              const o = ac.createOscillator(),
+                l = ac.createOscillator(),
+                lg = ac.createGain();
+              o.type = "sine";
+              o.frequency.value = f;
+              l.frequency.value = 0.1 + i * 0.05;
+              lg.gain.value = 0.4;
+              const v = ac.createGain();
+              v.gain.value = 0.5;
+              l.connect(lg);
+              lg.connect(v.gain);
+              o.connect(v);
+              v.connect(g);
+              o.start();
+              l.start();
+            });
+          }
+          on = !on;
+          on ? ac.resume() : ac.suspend();
+          $("#music").textContent = on ? "⏸" : "🎵";
+          $("#music").setAttribute(
+            "aria-label",
+            on ? "Pause music" : "Play music",
+          );
+        } catch (e) {}
+      }
+      /* Local song: put your own song.mp3 in the same folder as this file. If it's missing, the soft ambient tone plays instead. */
+      const track = new Audio("song.mp3");
+      track.loop = true;
+      let useTrack = true;
+      track.addEventListener("error", () => {
+        useTrack = false;
+      });
+      $("#music").onclick = () => {
+        if (!useTrack) {
+          ambient();
+          return;
+        }
+        if (track.paused) {
+          track
+            .play()
+            .then(() => {
+              $("#music").textContent = "⏸";
+            })
+            .catch(() => {
+              useTrack = false;
+              ambient();
+            });
+        } else {
+          track.pause();
+          $("#music").textContent = "🎵";
+        }
+      };
+    </script>
+  </body>
+</html>
